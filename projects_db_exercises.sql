@@ -61,7 +61,7 @@ SELECT DISTINCT(tech.name)
 FROM project
 RIGHT OUTER JOIN project_uses_tech ON project_uses_tech.project_id = project.id
 RIGHT OUTER JOIN tech ON project_uses_tech.tech_id = tech.id
-WHERE project_id is NULL;
+WHERE project_id IS NULL;
 
 
 #10 List all the distinct prjects that use at least one tech.;
@@ -100,3 +100,103 @@ FROM project
 LEFT OUTER JOIN project_uses_tech
 ON  project_uses_tech.project_id = project.id
 GROUP BY project.id ORDER BY tech_totals) AS techs_per_project;
+
+
+
+# RESTAURANT DB V2
+
+UPDATE student SET points=9 WHERE id = 1;
+CREATE TABLE student (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name VARCHAR,
+  github VARCHAR,
+  points INTEGER DEFAULT 0,
+  start_date DATE,
+  graduated BOOLEAN DEFAULT FALSE
+);
+
+#1 List all the reviews for a given restaurant given a specific restaurant ID.;#
+SELECT review FROM review WHERE restaurant_id = 4;
+
+#2 List all the reviews for a given restaurant, given a specific restaurant name.;#
+
+SELECT review FROM review
+JOIN restaurant
+ON review.restaurant_id = restaurant.id
+WHERE restaurant.name = 'R4';
+
+#3 List all reviews for a given reviewer, given a spefic reviewers name.;
+
+SELECT review FROM review
+JOIN reviewer
+ON review.reviewer_id = reviewer.id
+WHERE reviewer.name = 'Old Fart';
+
+#4 List all the reviews along with the restaurant they were written for.  In the query result, select the restaurant name and the review text.;
+
+SELECT review, restaurant_id FROM review
+JOIN restaurant
+ON review.restaurant_id = restaurant.id
+WHERE restaurant.name = 'R4';
+
+#5 Get the average stars by restaurant. the result should have the restaurant name and its average star rating;.
+
+SELECT restaurant.name, AVG(stars) AS avg_stars
+FROM review
+JOIN restaurant
+ON restaurant_id = restaurant.id
+WHERE restaurant.name = 'R4'
+GROUP BY restaurant.name;
+
+#6 Get the number of reviews written for each restaurant. The result should have the restaurant name and its review count.;
+
+SELECT restaurant.name, COUNT(review) AS total_num_of_reviews
+FROM review
+JOIN restaurant
+ON restaurant_id = restaurant.id
+GROUP BY restaurant.name;
+
+#7 List all the reviews along with the restaurant, and the reviewers name. The result should have the restaurant name, the review text, and the reviewer name. Hint: you will need to do a three-way join - i.e. joining all three tables together.;
+
+SELECT review, restaurant.name AS restaurant_name, reviewer.name AS reviewer_name
+FROM review
+LEFT JOIN restaurant ON review.restaurant_id = restaurant.id
+LEFT JOIN reviewer ON review.reviewer_id = reviewer.id;
+
+#8 Get the average stars given by each reviewer(reviewer name, averag star rating);
+
+SELECT reviewer.name, AVG(stars) AS avg_stars
+FROM review
+JOIN reviewer
+ON reviewer_id = reviewer.id
+GROUP BY reviewer.name;
+
+#9 Get the lowest star rating given by each reviewer. (reviewer name, lowest star rating);
+
+SELECT reviewer.name, MIN(stars) AS lowest_stars
+FROM review
+JOIN reviewer
+ON reviewer_id = reviewer.id
+GROUP BY reviewer.name;
+
+#10 Get the number of restaurants in each category. (category name, restaurant count);
+SELECT category, COUNT(name) AS restaurant_count
+FROM restaurant
+GROUP BY restaurant.category;
+
+#11 Get number of 5 star reviews given by restaurant. (restaurant name, 5-star count);
+
+SELECT restaurant.name AS restaurant_name, COUNT(stars) AS total_5_star_reviews
+FROM review
+JOIN restaurant
+ON restaurant_id = restaurant.id
+WHERE stars = 5
+GROUP BY restaurant.name;
+
+#12 Get the average star rating for a food category. (category name, average star rating);
+
+SELECT restaurant.category, AVG(stars) AS avg_stars_by_category
+FROM review
+JOIN restaurant
+ON restaurant_id = restaurant.id
+GROUP BY restaurant.category;
